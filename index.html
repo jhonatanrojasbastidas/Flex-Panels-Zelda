@@ -90,32 +90,69 @@
       flex: 5;
     }
 
+    .audio-interface {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  font-family: 'helvetica neue', sans-serif;
+  border-bottom: 2px solid #6B0F9C; /* Un toque de color para combinar */
+}
+
+#playPauseBtn {
+  background: #6B0F9C;
+  border: none;
+  color: white;
+  padding: 8px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+#playPauseBtn:hover {
+  background: #8e24aa;
+}
+
+#trackName {
+  font-size: 0.9em;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
   </style>
 
-
+<div class="audio-interface">
+  <button id="playPauseBtn">Reproducir</button>
+  <span id="trackName">Selecciona un panel</span>
+</div>
   <div class="panels">
-      <audio src="Zeldas Lullaby - The Legend of Zelda Skyward Sword.mp3"  autoplay="autoplay" preload=""></audio>
-    <div class="panel panel1">
+  
+      <audio id="bgMusic" src="Zeldas Lullaby - The Legend of Zelda Skyward Sword.mp3" preload="auto"></audio>
+    <div class="panel panel1" data-audio="Field - Day.mp3" data-title="Field">
       <p>Hey</p>
       <p>Let's</p>
       <p>Explore</p>
     </div>
-    <div class="panel panel2">
+    <div class="panel panel2" data-audio="Stables.mp3" data-title="Stables">
       <p>Give</p>
       <p>Take</p>
       <p>Fight</p>
     </div>
-    <div class="panel panel3">
+    <div class="panel panel3" data-audio="Teba's Theme.mp3" data-title="Teba's Theme">
       <p>Play</p>
       <p>It</p>
       <p>Today</p>
     </div>
-    <div class="panel panel4">
+    <div class="panel panel4" data-audio="Temple Of Time.mp3" data-title="Temple of Time">
       <p>Be</p>
       <p>All</p>
       <p>Fierce</p>
     </div>
-    <div class="panel panel5">
+    <div class="panel panel5" data-audio="Zeldas Lullaby - The Legend of Zelda Skyward Sword.mp3" data-title="Zelda's Lullaby">
       <p>Walk</p>
       <p>In</p>
       <p>Gaming</p>
@@ -124,10 +161,54 @@
 
   <script>
     const panels = document.querySelectorAll('.panel');
+const audio = document.getElementById('bgMusic');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const trackName = document.getElementById('trackName');
 
-    function  toggleOpen (){
-      this.classList.toggle('open');
+function toggleOpen() {
+  // 1. Animación del panel
+  this.classList.toggle('open');
+  
+  // 2. Obtener los datos del panel
+  const newSrc = this.getAttribute('data-audio');
+  const title = this.getAttribute('data-title');
+  const middleText = this.querySelector('p:nth-child(2)').innerText;
+
+  // 3. Lógica inteligente de audio
+  if (newSrc) {
+    // Si la canción es diferente a la que está sonando, la cambiamos
+    // Usamos .includes() porque audio.src a veces devuelve la URL completa
+    if (!audio.src.includes(newSrc)) {
+      audio.src = newSrc;
+      
+      // Prioridad: Si hay data-title usa ese, si no, usa el texto del panel
+      trackName.innerText = "Playing: " + (title || middleText);
+      
+      audio.play().catch(e => console.log("Error al reproducir:", e));
+      playPauseBtn.innerText = "Pausar";
+    } else {
+      // Si es la misma canción, simplemente le damos Play/Pause
+      if (audio.paused) {
+        audio.play();
+        playPauseBtn.innerText = "Pausar";
+      } else {
+        audio.pause();
+        playPauseBtn.innerText = "Reproducir";
+      }
     }
+  }
+}
+
+// Botón de Play/Pause
+playPauseBtn.addEventListener('click', () => {
+  if (audio.paused) {
+    audio.play();
+    playPauseBtn.innerText = 'Pausar';
+  } else {
+    audio.pause();
+    playPauseBtn.innerText = 'Reproducir';
+  }
+});
 
     function toggleActive (e){
       if(e.propertyName.includes('flex')){
